@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Món quà Giáng Sinh</title>
+
+<style>
+*{box-sizing:border-box;}
+body{
+  margin:0;
+  overflow:hidden;
+  font-family:'Times New Roman',serif;
+  background:#000814;
+}
+
+/* ===== BỘ ĐẾM ===== */
+#counter{
+  position:fixed;
+  top:15px;
+  left:15px;
+  color:white;
+  font-size:18px;
+  z-index:9;
+  opacity:.8;
+}
+
+/* ===== MÀN XÁC NHẬN ===== */
+#confirm{
+  position:fixed;
+  inset:0;
+  background:linear-gradient(135deg,#ffd6e8,#ffeaf4);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  z-index:10;
+}
+.box{
+  background:white;
+  padding:35px 30px;
+  border-radius:18px;
+  text-align:center;
+  box-shadow:0 20px 40px rgba(0,0,0,.25);
+}
+.question{
+  font-size:22px;
+  margin-bottom:25px;
+}
+.buttons{
+  position:relative;
+  height:60px;
+}
+button{
+  font-size:18px;
+  padding:10px 22px;
+  border:none;
+  border-radius:12px;
+  cursor:pointer;
+}
+#yes{background:#ff6fae;color:white;}
+#no{position:absolute;background:#ccc;}
+
+/* ===== NỀN ===== */
+#gift{
+  position:fixed;
+  inset:0;
+  background:radial-gradient(circle at top,#0b1f3a,#000814);
+  display:none;
+}
+
+/* ===== TRÁI TIM ===== */
+#heart{
+  position:fixed;
+  inset:0;
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:5;
+}
+.heart{
+  font-size:120px;
+  animation:beat 1s infinite;
+  text-shadow:0 0 35px #ff4d6d;
+}
+@keyframes beat{
+  0%{transform:scale(1);}
+  50%{transform:scale(1.15);}
+  100%{transform:scale(1);}
+}
+
+/* ===== TUYẾT ===== */
+.snow{
+  position:absolute;
+  top:-20px;
+  font-size:18px;
+  color:white;
+  cursor:pointer;
+  text-shadow:0 0 6px white;
+}
+
+/* ===== PHONG THƯ ===== */
+.envelope{
+  position:fixed;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%) scale(0);
+  width:330px;
+  background:#fff;
+  border-radius:12px;
+  padding:15px;
+  text-align:center;
+  transition:.4s;
+  z-index:6;
+  box-shadow:0 20px 40px rgba(0,0,0,.3);
+}
+.envelope.show{
+  transform:translate(-50%,-50%) scale(1);
+}
+.photo{
+  width:100%;
+  max-height:200px;
+  object-fit:cover;
+  border-radius:10px;
+  margin-bottom:10px;
+}
+.close{
+  margin-top:10px;
+  cursor:pointer;
+  color:#ff4d6d;
+}
+</style>
+</head>
+
+<audio id="bgm" loop>
+  <source src="music/music.mp3" type="audio/mpeg">
+</audio>
+<body>
+
+<div id="counter">0 / 6</div>
+
+<!-- XÁC NHẬN -->
+<div id="confirm">
+  <div class="box">
+    <div class="question">Em có chấp nhận món quà này không? 💝</div>
+    <div class="buttons">
+      <button id="yes">Có</button>
+      <button id="no">Không</button>
+    </div>
+  </div>
+</div>
+
+<div id="gift"></div>
+
+<div id="heart">
+  <div class="heart">❤️</div>
+</div>
+
+<div class="envelope" id="envelope">
+  <img id="letterImage" class="photo">
+  <div id="letterText"></div>
+  <div class="close">Đóng ✖</div>
+</div>
+
+<script>
+    const yes = document.getElementById("yes"); // nút CÓ
+const no = document.getElementById("no");   // nút KHÔNG
+const confirm = document.getElementById("confirm"); // màn xác nhận
+const gift = document.getElementById("gift"); // nền sau
+const heart = document.getElementById("heart"); // trái tim
+
+const images=[
+  "images/pic1.jpg",
+  "images/pic2.jpg",
+  "images/pic3.jpg",
+  "images/pic4.jpg",
+  "images/pic5.jpg",
+  "images/pic6.jpg"
+];
+
+const shortTexts=[
+  "Chúc Giáng Sinh an lành 🎄",
+  "圣诞快乐，平安喜乐 🎄"
+];
+
+const finalText=`Anh yêu em nhiều lắm.
+Anh vui vì Giáng Sinh năm nay của anh đã có em.
+Tuy không phải người yêu nhưng mà anh cũng đã được ở bên em.
+Anh mong là Giáng Sinh năm sau và về sau nữa
+anh cũng sẽ được ở bên em ❤️`;
+
+let used=[];
+let count=0;
+
+const counter=document.getElementById("counter");
+const envelope=document.getElementById("envelope");
+const letterImage=document.getElementById("letterImage");
+const letterText=document.getElementById("letterText");
+
+/* nút KHÔNG chạy */
+no.onmouseenter=no.ontouchstart=()=>{
+  no.style.left=Math.random()*120+"px";
+  no.style.top=Math.random()*40+"px";
+};
+
+/* nhấn CÓ */
+yes.onclick = () => {
+  document.getElementById("bgm").play(); // phát nhạc
+
+  confirm.style.display="none";
+  gift.style.display="block";
+  heart.style.display="flex";
+
+  setTimeout(()=>{
+    heart.style.display="none";
+    setInterval(createSnow,300);
+  },5000);
+};
+
+/* tạo tuyết */
+function createSnow(){
+  const s=document.createElement("div");
+  s.className="snow";
+  s.innerText="❄";
+  s.style.left=Math.random()*innerWidth+"px";
+  s.style.fontSize=(14+Math.random()*16)+"px";
+  document.body.appendChild(s);
+
+  s.animate(
+    [{transform:"translateY(0)"},{transform:`translateY(${innerHeight}px)`}],
+    {duration:7000,easing:"linear"}
+  ).onfinish=()=>s.remove();
+
+  s.onclick=()=>{
+    openLetter();
+    s.remove();
+  };
+}
+
+/* mở thư */
+function openLetter(){
+  if(count>=6) return;
+
+  let img;
+  do{
+    img=images[Math.floor(Math.random()*images.length)];
+  }while(used.includes(img));
+
+  used.push(img);
+  count++;
+  counter.innerText=`${count} / 6`;
+
+  letterImage.src=img;
+
+  if(count<6){
+    letterText.innerText=shortTexts[Math.floor(Math.random()*shortTexts.length)];
+  }else{
+    letterText.innerText=finalText;
+  }
+
+  envelope.classList.add("show");
+}
+
+/* đóng thư */
+document.querySelector(".close").onclick=()=>{
+  envelope.classList.remove("show");
+};
+</script>
+
+</body>
+</html>
